@@ -22,11 +22,14 @@ const initialNodes = [
     {
         id: 'node-1',
         type: 'node',
-        position: { x: 0, y: 0 },
+        position: { x: 0, y: 200 },
         data: { app: 'MyApp', action: 'MyAction' },
     },
 ];
-const initialEdges = [{ id: 'n1-n2', source: 'n1', target: 'n2' }];
+const initialEdges = [
+    { id: 'n1-n2', source: 'n1', target: 'n2' },
+    { id: 'n2-node-1', source: 'n2', target: 'node-1' }
+];
 
 export default function FlowEditor() {
     const [nodes, setNodes] = useState(initialNodes);
@@ -53,6 +56,7 @@ export default function FlowEditor() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            deleteKeyCode={null}
             fitView
         >
             <Controls />

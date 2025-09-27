@@ -1,4 +1,8 @@
+import { useFlowCurrentUser, Connect, useFlowQuery } from "@onflow/react-sdk"
+
 export default function SideBar({ children }) {
+    const { user } = useFlowCurrentUser()
+
     return (
         <div style={{ display: "flex", height: "100vh" }}>
             {/* Left Pane */}
@@ -10,6 +14,8 @@ export default function SideBar({ children }) {
                     padding: "16px",
                 }}
             >
+                <Connect />
+                {user?.loggedIn && <p>Welcome, {user.addr}!</p>}
                 <h2 style={{ marginBottom: "16px", fontSize: "18px" }}>Menu</h2>
                 <ul style={{ listStyle: "none", padding: 0 }}>
                     <li style={{ marginBottom: "12px" }}>
