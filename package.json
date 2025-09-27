@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "@onflow/react-sdk": "^0.10.2",
+    "@tailwindcss/vite": "^4.1.13",
     "@xyflow/react": "^12.8.6",
+    "lucide-react": "^0.544.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "tailwindcss": "^4.1.13",
     "uuid": "^13.0.0"
   },
   "devDependencies": {

@@ -1,0 +1,191 @@
+import '@xyflow/react/dist/style.css';
+import { X, Percent } from 'lucide-react';
+
+export const ConfigPanel = ({
+    nodes,
+    selectedNode,
+    showConfig,
+    setShowConfig,
+    updateNodeData,
+}) => {
+    if (!selectedNode || !showConfig) return null;
+
+    const nodeData = selectedNode.data;
+    const nodeType = selectedNode.type;
+
+    return (
+        <div className="fixed right-0 top-0 h-full w-80 bg-white border-l border-gray-200 shadow-lg z-20 overflow-y-auto">
+            <div className="p-4 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-gray-800">Configure Component</h3>
+                    <button
+                        onClick={() => setShowConfig(false)}
+                        className="p-1 hover:bg-gray-100 rounded"
+                    >
+                        <X className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+
+            <div className="p-4 space-y-4">
+                {nodeType === 'wallet' && (
+                    <>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>
+                            <input
+                                type="number"
+                                value={nodeData.amount || ''}
+                                onChange={(e) => updateNodeData(selectedNode.id, { amount: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Token</label>
+                            <select
+                                value={nodeData.token || ''}
+                                onChange={(e) => updateNodeData(selectedNode.id, { token: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value="FLOW">FLOW</option>
+                                <option value="USDC">USDC</option>
+                                <option value="stFLOW">stFLOW</option>
+                            </select>
+                        </div>
+                    </>
+                )}
+
+                {nodeType === 'swapper' && (
+                    <>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Protocol</label>
+                            <select
+                                value={nodeData.protocol || ''}
+                                onChange={(e) => updateNodeData(selectedNode.id, { protocol: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value="IncrementFi">IncrementFi</option>
+                                <option value="Some Other Protocol">Some Other Protocol</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">From Token</label>
+                            <select
+                                value={nodeData.fromToken || ''}
+                                onChange={(e) => updateNodeData(selectedNode.id, { fromToken: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value="FLOW">FLOW</option>
+                                <option value="USDC">USDC</option>
+                                <option value="stFLOW">stFLOW</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">To Token</label>
+                            <select
+                                value={nodeData.toToken || ''}
+                                onChange={(e) => updateNodeData(selectedNode.id, { toToken: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value="FLOW">FLOW</option>
+                                <option value="USDC">USDC</option>
+                                <option value="stFLOW">stFLOW</option>
+                            </select>
+                        </div>
+                    </>
+                )}
+
+                {nodeType === 'lending' && (
+                    <>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Action</label>
+                            <select
+                                value={nodeData.action || ''}
+                                onChange={(e) => updateNodeData(selectedNode.id, { action: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value="lend">Lend</option>
+                                <option value="borrow">Borrow</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Protocol</label>
+                            <select
+                                value={nodeData.protocol || ''}
+                                onChange={(e) => updateNodeData(selectedNode.id, { protocol: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value="IncrementFi">IncrementFi</option>
+                                <option value="Some Other Protocol">Some Other Protocol</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Token</label>
+                            <select
+                                value={nodeData.token || ''}
+                                onChange={(e) => updateNodeData(selectedNode.id, { token: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value="FLOW">FLOW</option>
+                                <option value="USDC">USDC</option>
+                                <option value="stFLOW">stFLOW</option>
+                            </select>
+                        </div>
+                        {nodeData.action === 'borrow' && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Borrow Percentage</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="100"
+                                    value={nodeData.amount || ''}
+                                    onChange={(e) => updateNodeData(selectedNode.id, { amount: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                />
+                            </div>
+                        )}
+                    </>
+                )}
+
+                {nodeType === 'loop' && (
+                    <>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Iterations</label>
+                            <input
+                                type="number"
+                                min="1"
+                                value={nodeData.iterations || ''}
+                                onChange={(e) => updateNodeData(selectedNode.id, { iterations: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Loop Target Node</label>
+                            <select
+                                value={nodeData.targetNodeId || ''}
+                                onChange={(e) => updateNodeData(selectedNode.id, { targetNodeId: e.target.value })}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                            >
+                                <option value="">Select target node</option>
+                                {nodes.filter(n => n.id !== selectedNode.id).map(node => (
+                                    <option key={node.id} value={node.id}>
+                                        Node {node.id} ({node.type})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </>
+                )}
+
+                <div className="pt-4 border-t border-gray-200">
+                    <button
+                        onClick={() => addMultipleOutputs(selectedNode.id)}
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                        <Percent className="w-4 h-4" />
+                        Split Outputs
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
