@@ -1,9 +1,17 @@
+import { Handle, Position } from '@xyflow/react';
 import { Clock, RotateCcw } from 'lucide-react';
+
+const CustomNode = ({ children, bgColor, selected }) => (
+    <div className={`px-4 py-3 bg-${bgColor}-100 border-2 rounded-lg shadow-md min-w-[180px] ${selected ? `border-${bgColor}-500` : `border-${bgColor}-300`}`}>
+        {children}
+        <Handle type="target" position={Position.Top} />
+        <Handle type="source" position={Position.Bottom} />
+    </div>
+)
 
 // Enhanced node components with handle positioning
 export const WalletNode = ({ data, selected }) => (
-    <div className={`px-4 py-3 bg-blue-100 border-2 rounded-lg shadow-md min-w-[180px] ${selected ? 'border-blue-500' : 'border-blue-300'
-        }`}>
+    <CustomNode bgColor='blue' selected={selected}>
         <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
             <span className="font-medium text-blue-800">{data.stepNumber}. Wallet</span>
@@ -11,12 +19,11 @@ export const WalletNode = ({ data, selected }) => (
         <div className="mt-2 text-sm text-blue-600">
             <div>Amount: {data.amount || '100'} {data.token || 'FLOW'}</div>
         </div>
-    </div>
+    </CustomNode>
 );
 
 export const SwapperNode = ({ data, selected }) => (
-    <div className={`px-4 py-3 bg-green-100 border-2 rounded-lg shadow-md min-w-[180px] ${selected ? 'border-green-500' : 'border-green-300'
-        }`}>
+    <CustomNode bgColor='green' selected={selected}>
         <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
             <span className="font-medium text-green-800">{data.stepNumber}. Swapper</span>
@@ -25,12 +32,11 @@ export const SwapperNode = ({ data, selected }) => (
             <div>Protocol: {data.protocol || 'IncrementFi'}</div>
             <div>{data.fromToken || 'FLOW'} → {data.toToken || 'USDC'}</div>
         </div>
-    </div>
+    </CustomNode>
 );
 
 export const LiquidStakingNode = ({ data, selected }) => (
-    <div className={`px-4 py-3 bg-purple-100 border-2 rounded-lg shadow-md min-w-[180px] ${selected ? 'border-purple-500' : 'border-purple-300'
-        }`}>
+    <CustomNode bgColor='purple' selected={selected}>
         <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
             <span className="font-medium text-purple-800">{data.stepNumber}. Liquid Staking</span>
@@ -39,12 +45,11 @@ export const LiquidStakingNode = ({ data, selected }) => (
             <div>Protocol: {data.protocol || 'IncrementFi'}</div>
             <div>{data.inputToken || 'FLOW'} → {data.outputToken || 'stFLOW'}</div>
         </div>
-    </div>
+    </CustomNode>
 );
 
 export const LendingNode = ({ data, selected }) => (
-    <div className={`px-4 py-3 bg-yellow-100 border-2 rounded-lg shadow-md min-w-[180px] ${selected ? 'border-yellow-500' : 'border-yellow-300'
-        }`}>
+    <CustomNode bgColor='yellow' selected={selected}>
         <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
             <span className="font-medium text-yellow-800">
@@ -56,12 +61,11 @@ export const LendingNode = ({ data, selected }) => (
             <div>Token: {data.token || 'USDC'}</div>
             {data.action === 'borrow' && <div>Amount: {data.amount || '90'}%</div>}
         </div>
-    </div>
+    </CustomNode>
 );
 
 export const FlashLoanNode = ({ data, selected }) => (
-    <div className={`px-4 py-3 bg-red-100 border-2 rounded-lg shadow-md min-w-[180px] ${selected ? 'border-red-500' : 'border-red-300'
-        }`}>
+    <CustomNode bgColor='red' selected={selected}>
         <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
             <span className="font-medium text-red-800">{data.stepNumber}. Flash Loan</span>
@@ -70,12 +74,11 @@ export const FlashLoanNode = ({ data, selected }) => (
             <div>Protocol: {data.protocol || 'Some Protocol'}</div>
             <div>Token: {data.token || 'FLOW'}</div>
         </div>
-    </div>
+    </CustomNode>
 );
 
 export const PriceNode = ({ data, selected }) => (
-    <div className={`px-4 py-3 bg-gray-100 border-2 rounded-lg shadow-md min-w-[180px] ${selected ? 'border-gray-500' : 'border-gray-300'
-        }`}>
+    <CustomNode bgColor='gray' selected={selected}>
         <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-gray-500 rounded-full"></div>
             <span className="font-medium text-gray-800">{data.stepNumber}. Price Oracle</span>
@@ -84,12 +87,11 @@ export const PriceNode = ({ data, selected }) => (
             <div>Source: {data.source || 'Some Oracle'}</div>
             <div>Pair: {data.pair || 'FLOW/USDC'}</div>
         </div>
-    </div>
+    </CustomNode>
 );
 
 export const LoopNode = ({ data, selected }) => (
-    <div className={`px-4 py-3 bg-indigo-100 border-2 rounded-lg shadow-md min-w-[180px] ${selected ? 'border-indigo-500' : 'border-indigo-300'
-        }`}>
+    <CustomNode bgColor='indigo' selected={selected}>
         <div className="flex items-center gap-2">
             <RotateCcw className="w-4 h-4 text-indigo-600" />
             <span className="font-medium text-indigo-800">{data.stepNumber}. Loop Start</span>
@@ -98,12 +100,11 @@ export const LoopNode = ({ data, selected }) => (
             <div>Iterations: {data.iterations || '3'}</div>
             <div>Target: {data.targetNodeId || 'Select target'}</div>
         </div>
-    </div>
+    </CustomNode>
 );
 
 export const ScheduleNode = ({ data, selected }) => (
-    <div className={`px-4 py-3 bg-orange-100 border-2 rounded-lg shadow-md min-w-[180px] ${selected ? 'border-orange-500' : 'border-orange-300'
-        }`}>
+    <CustomNode bgColor='orange' selected={selected}>
         <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-orange-600" />
             <span className="font-medium text-orange-800">{data.stepNumber}. Schedule</span>
@@ -111,5 +112,5 @@ export const ScheduleNode = ({ data, selected }) => (
         <div className="mt-2 text-sm text-orange-600">
             <div>Frequency: {data.frequency || 'Weekly'}</div>
         </div>
-    </div>
+    </CustomNode>
 );

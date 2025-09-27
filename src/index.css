@@ -65,6 +65,14 @@ body {
   font-size: 10px;
 }
 
+.wallet-connect button {
+  background: rgb(30, 41, 59) !important;
+}
+
+.wallet-connect button:hover {
+  background: rgb(52, 71, 103) !important;
+}
+
 /* .sidebar {
   background: var(--color3);
   width: 240px;

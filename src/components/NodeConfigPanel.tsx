@@ -1,8 +1,17 @@
+import {
+    MarkerType,
+    Position,
+} from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { X, Percent } from 'lucide-react';
 
 export const ConfigPanel = ({
     nodes,
+    setNodes,
+    setEdges,
+    nodeCounter,
+    setNodeCounter,
+    getDefaultNodeData,
     selectedNode,
     showConfig,
     setShowConfig,
@@ -12,6 +21,57 @@ export const ConfigPanel = ({
 
     const nodeData = selectedNode.data;
     const nodeType = selectedNode.type;
+
+
+    const addMultipleOutputs = (sourceNodeId) => {
+        const targetCount = parseInt(prompt('How many outputs do you want?') || '2');
+        if (targetCount > 1) {
+            // Remove existing edges from this source
+            setEdges(eds => eds.filter(e => e.source !== sourceNodeId));
+
+            // Add multiple nodes with percentage splits
+            const percentagePerOutput = Math.floor(100 / targetCount);
+            let remainingPercentage = 100;
+            const sourceNode = nodes.find(n => n.id === sourceNodeId);
+
+            for (let i = 0; i < targetCount; i++) {
+                const isLast = i === targetCount - 1;
+                const percentage = isLast ? remainingPercentage : percentagePerOutput;
+                remainingPercentage -= percentage;
+
+                const newId = `${nodeCounter + i + 1}`;
+                const newStepNumber = sourceNode.data.stepNumber + 1;
+
+                const newNode = {
+                    id: newId,
+                    type: 'swapper', // Default type
+                    position: {
+                        x: 300 + (i * 200) - ((targetCount - 1) * 100),
+                        y: sourceNode.position.y + 150
+                    },
+                    data: { ...getDefaultNodeData('swapper'), stepNumber: newStepNumber },
+                    draggable: false,
+                    sourcePosition: Position.Bottom,
+                    targetPosition: Position.Top,
+                };
+
+                const newEdge = {
+                    id: `e${sourceNodeId}-${newId}`,
+                    source: sourceNodeId,
+                    target: newId,
+                    markerEnd: { type: MarkerType.ArrowClosed },
+                    style: { strokeWidth: 2 },
+                    data: { percentage: percentage },
+                    label: `${percentage}%`,
+                };
+
+                setNodes(nds => [...nds, newNode]);
+                setEdges(eds => [...eds, newEdge]);
+            }
+
+            setNodeCounter(prev => prev + targetCount);
+        }
+    };
 
     return (
         <div className="fixed right-0 top-0 h-full w-80 bg-white border-l border-gray-200 shadow-lg z-20 overflow-y-auto">
