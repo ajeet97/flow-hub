@@ -9,7 +9,6 @@ const CustomNode = ({ children, bgColor, selected }) => (
     </div>
 )
 
-// Enhanced node components with handle positioning
 export const WalletNode = ({ data, selected }) => (
     <CustomNode bgColor='blue' selected={selected}>
         <div className="flex items-center gap-2">
@@ -17,7 +16,7 @@ export const WalletNode = ({ data, selected }) => (
             <span className="font-medium text-blue-800">{data.stepNumber}. Wallet</span>
         </div>
         <div className="mt-2 text-sm text-blue-600">
-            <div>Amount: {data.amount || '100'} {data.token || 'FLOW'}</div>
+            <div>Amount: {data.amount || '100'} {data.token || 'FlowToken'}</div>
         </div>
     </CustomNode>
 );
@@ -30,7 +29,8 @@ export const SwapperNode = ({ data, selected }) => (
         </div>
         <div className="mt-2 text-sm text-green-600">
             <div>Protocol: {data.protocol || 'IncrementFi'}</div>
-            <div>{data.fromToken || 'FLOW'} → {data.toToken || 'USDC'}</div>
+            {/* <div>{data.fromToken || 'FlowToken'} → {data.toToken || 'USDCFlow'}</div> */}
+            <div>to {data.toToken || 'USDCFlow'}</div>
         </div>
     </CustomNode>
 );
@@ -43,7 +43,7 @@ export const LiquidStakingNode = ({ data, selected }) => (
         </div>
         <div className="mt-2 text-sm text-purple-600">
             <div>Protocol: {data.protocol || 'IncrementFi'}</div>
-            <div>{data.inputToken || 'FLOW'} → {data.outputToken || 'stFLOW'}</div>
+            <div>{data.outputToken || 'stFlowToken'}</div>
         </div>
     </CustomNode>
 );
@@ -58,7 +58,7 @@ export const LendingNode = ({ data, selected }) => (
         </div>
         <div className="mt-2 text-sm text-yellow-600">
             <div>Protocol: {data.protocol || 'IncrementFi'}</div>
-            <div>Token: {data.token || 'USDC'}</div>
+            <div>Token: {data.token || 'USDCFlow'}</div>
             {data.action === 'borrow' && <div>Amount: {data.amount || '90'}%</div>}
         </div>
     </CustomNode>
@@ -72,7 +72,7 @@ export const FlashLoanNode = ({ data, selected }) => (
         </div>
         <div className="mt-2 text-sm text-red-600">
             <div>Protocol: {data.protocol || 'Some Protocol'}</div>
-            <div>Token: {data.token || 'FLOW'}</div>
+            <div>Token: {data.token || 'FlowToken'}</div>
         </div>
     </CustomNode>
 );
@@ -85,7 +85,7 @@ export const PriceNode = ({ data, selected }) => (
         </div>
         <div className="mt-2 text-sm text-gray-600">
             <div>Source: {data.source || 'Some Oracle'}</div>
-            <div>Pair: {data.pair || 'FLOW/USDC'}</div>
+            <div>Pair: {data.pair || 'FlowToken/USDCFlow'}</div>
         </div>
     </CustomNode>
 );

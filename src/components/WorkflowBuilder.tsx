@@ -24,6 +24,8 @@ import {
     ScheduleNode
 } from './CustomNodes';
 import { ConfigPanel } from './NodeConfigPanel';
+import { convertNodesToSteps } from '../cadence-workflow-tx-generator/convert-nodes-to-steps';
+import { CadenceTxGenerator } from '../cadence-workflow-tx-generator/generate';
 
 const nodeTypes = {
     wallet: WalletNode,
@@ -42,7 +44,7 @@ const WorkflowBuilder = () => {
             id: '1',
             type: 'wallet',
             position: { x: 300, y: 50 },
-            data: { amount: '100', token: 'FLOW', stepNumber: 1 },
+            data: { amount: '100', token: 'FlowToken', stepNumber: 1 },
             draggable: false,
             sourcePosition: Position.Bottom,
             targetPosition: Position.Top,
@@ -71,21 +73,6 @@ const WorkflowBuilder = () => {
             current.data.stepNumber > last.data.stepNumber ? current : last
         );
 
-        if (lastNode) {
-            position = { x: 300, y: lastNode.position.y + 150 };
-            // Add edge from last node to new node
-            // @ts-ignore
-            const newEdges = edges.concat([{
-                id: `e${lastNode.id}-${newId}`,
-                source: lastNode.id,
-                target: newId,
-                markerEnd: { type: MarkerType.ArrowClosed },
-                style: { strokeWidth: 2 },
-                data: { percentage: 100 }
-            }])
-            setEdges(newEdges)
-        }
-
         const newNode = {
             id: newId,
             type: type,
@@ -95,24 +82,50 @@ const WorkflowBuilder = () => {
             sourcePosition: Position.Bottom,
             targetPosition: Position.Top,
         };
+        const newNodes = nodes.concat(newNode);
 
-        setNodes((nds) => nds.concat(newNode));
+        try {
+            // Validate added node
+            const steps = convertNodesToSteps(newNodes);
+            console.log('intermediate steps:', steps)
+            new CadenceTxGenerator(steps).generate();
+
+            // Update the nodes
+            setNodes(newNodes);
+
+            // Add edge from last node to new node
+            // @ts-ignore
+            const newEdges = edges.concat([{
+                id: `e${lastNode.id}-${newId}`,
+                source: lastNode.id,
+                target: newId,
+                markerEnd: { type: MarkerType.ArrowClosed },
+                style: { strokeWidth: 2 },
+                // data: { percentage: 100 }
+            }])
+            setEdges(newEdges)
+        } catch (err: any) {
+            alert(err.message)
+
+            // revert node counter
+            setNodeCounter(prev => prev - 1);
+        }
     };
 
     const getDefaultNodeData = (type) => {
         switch (type) {
             case 'wallet':
-                return { amount: '100', token: 'FLOW' };
+                return { amount: '100', token: 'FlowToken' };
             case 'swapper':
-                return { protocol: 'IncrementFi', fromToken: 'FLOW', toToken: 'USDC' };
+                return { protocol: 'IncrementFi', fromToken: 'FlowToken', toToken: 'USDCFlow' };
             case 'liquidStaking':
-                return { protocol: 'IncrementFi', inputToken: 'FLOW', outputToken: 'stFLOW' };
+                return { protocol: 'IncrementFi', inputToken: 'FlowToken', outputToken: 'stFlowToken' };
             case 'lending':
-                return { protocol: 'IncrementFi', action: 'lend', token: 'USDC', amount: '100' };
+                return { protocol: 'IncrementFi', action: 'lend', token: 'USDCFlow', amount: '100' };
             case 'flashLoan':
-                return { protocol: 'Some Protocol', token: 'FLOW' };
+                return { protocol: 'Some Protocol', token: 'FlowToken' };
             case 'price':
-                return { source: 'Some Oracle', pair: 'FLOW/USDC' };
+                return { source: 'Some Oracle', pair: 'FlowToken/USDCFlow' };
             case 'loop':
                 return { iterations: '3', targetNodeId: null };
             case 'schedule':
@@ -134,12 +147,25 @@ const WorkflowBuilder = () => {
         default: (props) => <CustomEdge {...props} />
     }), []);
 
+    const onExecuteClick = useCallback((event) => {
+        event.stopPropagation();
+
+        const steps = convertNodesToSteps(nodes);
+        const tx = new CadenceTxGenerator(steps)
+        console.log('execute clicked:');
+        console.log('  Nodes:', nodes);
+        // console.log('  Edges:', edges);
+        console.log('  Steps:', steps)
+        console.log('  Tx:', tx.generate())
+
+    }, [nodes, edges])
+
     return (
         <div className="w-screen h-screen flex flex-col bg-gray-50 fixed inset-0">
             {/* Header */}
             <div className="bg-white border-b border-gray-200 px-4 py-3 z-10">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-xl font-semibold text-gray-800">DeFi Workflow Builder</h1>
+                    <h1 className="text-xl font-semibold text-gray-800">FlowHub</h1>
                     <div className="flex items-center gap-2">
                         {/* <button
                             onClick={() => setShowNodePanel(!showNodePanel)}
@@ -148,7 +174,10 @@ const WorkflowBuilder = () => {
                             <Plus className="w-4 h-4" />
                             Add Component
                         </button> */}
-                        <button className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                        <button
+                            className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                            onClick={onExecuteClick}
+                        >
                             <Play className="w-4 h-4" />
                             Execute
                         </button>
@@ -168,12 +197,13 @@ const WorkflowBuilder = () => {
                             {[
                                 { type: 'wallet', label: '💳 Wallet', desc: 'Token source' },
                                 { type: 'swapper', label: '🔄 Swapper', desc: 'Token exchange' },
-                                { type: 'liquidStaking', label: '🥩 Liquid Staking', desc: 'Stake tokens' },
-                                { type: 'lending', label: '🏦 Lending', desc: 'Lend/Borrow' },
-                                { type: 'flashLoan', label: '⚡ Flash Loan', desc: 'Instant loan' },
-                                { type: 'price', label: '📊 Price Oracle', desc: 'Price feed' },
-                                { type: 'loop', label: '🔁 Loop', desc: 'Repeat steps' },
-                                { type: 'schedule', label: '⏰ Schedule', desc: 'Time trigger' },
+                                { type: 'liquidStaking', label: '🥩 Liquid Stake', desc: 'Stake tokens' },
+                                // { type: 'lending', label: '🏦 Lend', desc: 'Lend/Borrow' },
+                                // { type: 'borrowing', label: '🏦 Borrow', desc: 'Lend/Borrow' },
+                                // { type: 'flashLoan', label: '⚡ Flash Loan', desc: 'Instant loan' },
+                                // { type: 'price', label: '📊 Price Oracle', desc: 'Price feed' },
+                                // { type: 'loop', label: '🔁 Loop', desc: 'Repeat steps' },
+                                // { type: 'schedule', label: '⏰ Schedule', desc: 'Time trigger' },
                             ].map(({ type, label, desc }) => (
                                 <button
                                     key={type}
