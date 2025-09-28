@@ -73,6 +73,8 @@ export const ConfigPanel = ({
     //     }
     // };
 
+    if (nodeType == 'walletSink') return null
+
     return (
         <div className="fixed right-0 top-0 h-full w-80 bg-white border-l border-gray-200 shadow-lg z-20 overflow-y-auto">
             <div className="p-4 border-b border-gray-200">
@@ -88,7 +90,7 @@ export const ConfigPanel = ({
             </div>
 
             <div className="p-4 space-y-4">
-                {nodeType === 'wallet' && (
+                {nodeType === 'walletSource' && (
                     <>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Amount</label>

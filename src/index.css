@@ -73,6 +73,17 @@ body {
   background: rgb(52, 71, 103) !important;
 }
 
+.execute-button {
+  font-size: 14px !important;
+  background: oklch(62.7% 0.194 149.214) !important;
+  color: white !important;
+  cursor: pointer !important;
+}
+
+.execute-button:hover {
+  background: oklch(52.7% 0.154 150.069) !important;
+}
+
 /* .sidebar {
   background: var(--color3);
   width: 240px;

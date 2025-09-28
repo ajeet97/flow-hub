@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Connect } from "@onflow/react-sdk"
+import { Connect, TransactionButton } from "@onflow/react-sdk"
 import {
     ReactFlow,
     Controls,
@@ -14,7 +14,8 @@ import { Play } from 'lucide-react';
 
 import { CustomEdge } from './CustomEdge';
 import {
-    WalletNode,
+    WalletSourceNode,
+    WalletSinkNode,
     SwapperNode,
     LiquidStakingNode,
     LendingNode,
@@ -28,7 +29,8 @@ import { convertNodesToSteps } from '../cadence-workflow-tx-generator/convert-no
 import { CadenceTxGenerator } from '../cadence-workflow-tx-generator/generate';
 
 const nodeTypes = {
-    wallet: WalletNode,
+    walletSource: WalletSourceNode,
+    walletSink: WalletSinkNode,
     swapper: SwapperNode,
     liquidStaking: LiquidStakingNode,
     lending: LendingNode,
@@ -39,12 +41,35 @@ const nodeTypes = {
 };
 
 const WorkflowBuilder = () => {
+    const getDefaultNodeData = (type) => {
+        switch (type) {
+            case 'walletSource':
+                return { amount: '100', token: 'USDCFlow' };
+            case 'swapper':
+                return { protocol: 'IncrementFi', toToken: 'FlowToken' };
+            case 'liquidStaking':
+                return { protocol: 'IncrementFi', outputToken: 'stFlowToken' };
+            case 'lending':
+                return { protocol: 'IncrementFi', action: 'lend', token: 'USDCFlow', amount: '100' };
+            case 'flashLoan':
+                return { protocol: 'Some Protocol', token: 'FlowToken' };
+            case 'price':
+                return { source: 'Some Oracle', pair: 'FlowToken/USDCFlow' };
+            case 'loop':
+                return { iterations: '3', targetNodeId: null };
+            case 'schedule':
+                return { frequency: 'Weekly' };
+            default:
+                return {};
+        }
+    };
+
     const [nodes, setNodes] = useNodesState([
         {
             id: '1',
-            type: 'wallet',
+            type: 'walletSource',
             position: { x: 300, y: 50 },
-            data: { amount: '100', token: 'FlowToken', stepNumber: 1 },
+            data: { ...getDefaultNodeData('walletSource'), stepNumber: 1 },
             draggable: false,
             sourcePosition: Position.Bottom,
             targetPosition: Position.Top,
@@ -55,6 +80,7 @@ const WorkflowBuilder = () => {
     const [selectedNode, setSelectedNode] = useState(null);
     const [showConfig, setShowConfig] = useState(false);
     const [nodeCounter, setNodeCounter] = useState(1);
+    const [txCode, setTxCode] = useState('');
 
     const onNodeClick = useCallback((event, node) => {
         event.stopPropagation();
@@ -87,8 +113,10 @@ const WorkflowBuilder = () => {
         try {
             // Validate added node
             const steps = convertNodesToSteps(newNodes);
-            console.log('intermediate steps:', steps)
-            new CadenceTxGenerator(steps).generate();
+            console.log('steps:', steps)
+            const tx = new CadenceTxGenerator(steps).generate();
+
+            if (tx != null) setTxCode(tx);
 
             // Update the nodes
             setNodes(newNodes);
@@ -112,29 +140,6 @@ const WorkflowBuilder = () => {
         }
     };
 
-    const getDefaultNodeData = (type) => {
-        switch (type) {
-            case 'wallet':
-                return { amount: '100', token: 'FlowToken' };
-            case 'swapper':
-                return { protocol: 'IncrementFi', fromToken: 'FlowToken', toToken: 'USDCFlow' };
-            case 'liquidStaking':
-                return { protocol: 'IncrementFi', inputToken: 'FlowToken', outputToken: 'stFlowToken' };
-            case 'lending':
-                return { protocol: 'IncrementFi', action: 'lend', token: 'USDCFlow', amount: '100' };
-            case 'flashLoan':
-                return { protocol: 'Some Protocol', token: 'FlowToken' };
-            case 'price':
-                return { source: 'Some Oracle', pair: 'FlowToken/USDCFlow' };
-            case 'loop':
-                return { iterations: '3', targetNodeId: null };
-            case 'schedule':
-                return { frequency: 'Weekly' };
-            default:
-                return {};
-        }
-    };
-
     const updateNodeData = (nodeId, newData) => {
         setNodes(nds => nds.map(node =>
             node.id === nodeId
@@ -150,15 +155,17 @@ const WorkflowBuilder = () => {
     const onExecuteClick = useCallback((event) => {
         event.stopPropagation();
 
-        const steps = convertNodesToSteps(nodes);
-        const tx = new CadenceTxGenerator(steps)
-        console.log('execute clicked:');
-        console.log('  Nodes:', nodes);
-        // console.log('  Edges:', edges);
-        console.log('  Steps:', steps)
-        console.log('  Tx:', tx.generate())
+        console.log('txCode:', txCode);
 
-    }, [nodes, edges])
+        // const steps = convertNodesToSteps(nodes);
+        // const tx = new CadenceTxGenerator(steps)
+        // console.log('execute clicked:');
+        // console.log('  Nodes:', nodes);
+        // // console.log('  Edges:', edges);
+        // console.log('  Steps:', steps)
+        // console.log('  Tx:', tx.generate())
+
+    }, [txCode])
 
     return (
         <div className="w-screen h-screen flex flex-col bg-gray-50 fixed inset-0">
@@ -174,13 +181,25 @@ const WorkflowBuilder = () => {
                             <Plus className="w-4 h-4" />
                             Add Component
                         </button> */}
-                        <button
+
+                        <TransactionButton
+                            transaction={{ cadence: txCode }}
+                            label='Execute'
+                            variant='secondary'
+                            className='execute-button'
+                            disabled={!txCode}
+                            mutation={{
+                                onSuccess: (txId) => console.log("Transaction sent:", txId),
+                                onError: (error) => console.error("Transaction failed:", error),
+                            }}
+                        />
+                        {/* <button
                             className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
                             onClick={onExecuteClick}
                         >
                             <Play className="w-4 h-4" />
                             Execute
-                        </button>
+                        </button> */}
                         <div className="wallet-connect"><Connect variant='outline' /></div>
                     </div>
                 </div>
@@ -195,7 +214,8 @@ const WorkflowBuilder = () => {
                         </div>
                         <div className="space-y-2">
                             {[
-                                { type: 'wallet', label: '💳 Wallet', desc: 'Token source' },
+                                { type: 'walletSource', label: '💳 WalletSource', desc: 'Token withdraw' },
+                                { type: 'walletSink', label: '💳 WalletSink', desc: 'Token deposit' },
                                 { type: 'swapper', label: '🔄 Swapper', desc: 'Token exchange' },
                                 { type: 'liquidStaking', label: '🥩 Liquid Stake', desc: 'Stake tokens' },
                                 // { type: 'lending', label: '🏦 Lend', desc: 'Lend/Borrow' },
@@ -238,7 +258,7 @@ const WorkflowBuilder = () => {
                         <Controls />
                         {/* <MiniMap /> */}
                         <Background variant="dots" gap={12} size={1} />
-                        <defs>
+                        {/* <defs>
                             <marker
                                 id="arrow"
                                 viewBox="0 0 10 10"
@@ -250,7 +270,7 @@ const WorkflowBuilder = () => {
                             >
                                 <path d="M0,0 L0,6 L9,3 z" fill="#64748b" />
                             </marker>
-                        </defs>
+                        </defs> */}
                     </ReactFlow>
                 </div>
 

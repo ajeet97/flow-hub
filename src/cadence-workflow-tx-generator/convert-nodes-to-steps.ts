@@ -1,29 +1,60 @@
 import type { WorkflowStep } from "./types";
 
-function getWalletSteps(node: any, prevStep?: any, isLastNode = false): WorkflowStep[] {
-    const steps: WorkflowStep[] = []
-    // if not first step
-    if (node.data.stepNumber != 1) {
-        steps.push({
-            app: 'FungibleToken',
-            action: 'deposit',
-            account: 'self',
-            inputToken: node.data.token,
-            outputToken: node.data.token,
-        })
+// function getWalletSteps(node: any, prevStep?: any, isLastNode = false): WorkflowStep[] {
+//     const steps: WorkflowStep[] = []
+//     // if not first step
+//     if (node.data.stepNumber != 1) {
+//         steps.push({
+//             app: 'FungibleToken',
+//             action: 'deposit',
+//             account: 'self',
+//             inputToken: node.data.token,
+//             outputToken: node.data.token,
+//         })
+//     }
+
+//     if (!isLastNode) {
+//         steps.push({
+//             app: 'FungibleToken',
+//             action: 'withdraw',
+//             account: 'self',
+//             amount: node.data.amount,
+//             inputToken: node.data.token,
+//             outputToken: node.data.token,
+//         })
+//     }
+//     return steps
+// }
+
+function getWalletSourceSteps(node: any, prevStep?: any, isLastNode = false): WorkflowStep[] {
+    if (prevStep && prevStep.app == 'FungibleToken' && prevStep.action == 'withdraw') {
+        // ignore
+        return []
     }
 
-    if (!isLastNode) {
-        steps.push({
-            app: 'FungibleToken',
-            action: 'withdraw',
-            account: 'self',
-            amount: node.data.amount,
-            inputToken: node.data.token,
-            outputToken: node.data.token,
-        })
+    return [{
+        app: 'FungibleToken',
+        action: 'withdraw',
+        account: 'self',
+        amount: node.data.amount,
+        inputToken: node.data.token,
+        outputToken: node.data.token,
+    }]
+}
+
+function getWalletSinkSteps(node: any, prevStep?: any, isLastNode = false): WorkflowStep[] {
+    if (prevStep && prevStep.app == 'FungibleToken' && prevStep.action == 'deposit') {
+        // ignore
+        return []
     }
-    return steps
+
+    return [{
+        app: 'FungibleToken',
+        action: 'deposit',
+        account: 'self',
+        inputToken: prevStep.outputToken,
+        outputToken: prevStep.outputToken,
+    }]
 }
 
 function getSwapperSteps(node: any, prevStep?: any, isLastNode = false): WorkflowStep[] {
@@ -57,7 +88,8 @@ function getLiquidStakingSteps(node: any, prevStep?: any, isLastNode = false): W
 
 function getNodeSteps(node: any, prevStep?: any, isLastNode = false) {
     switch (node.type) {
-        case 'wallet': return getWalletSteps(node, prevStep, isLastNode)
+        case 'walletSource': return getWalletSourceSteps(node, prevStep, isLastNode)
+        case 'walletSink': return getWalletSinkSteps(node, prevStep, isLastNode)
         case 'swapper': return getSwapperSteps(node, prevStep, isLastNode)
         case 'liquidStaking': return getLiquidStakingSteps(node, prevStep, isLastNode)
         default: throw new Error(`Unknown node type: ${node.type}`)

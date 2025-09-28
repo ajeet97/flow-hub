@@ -83,8 +83,8 @@ export class CadenceTxGenerator {
             outVault: Type<@${step.outputToken}.Vault>(),
             uniqueID: nil
         )
-        let ${prefix}_quoteOut = ${prefix}_swapper.quoteOut(${inputVault}.balance, false)
-        let ${prefix}_output = ${prefix}_swapper.swap(${prefix}_quoteOut, <- ${inputVault})
+        let ${prefix}_quoteOut = ${prefix}_swapper.quoteOut(forProvided: ${inputVault}.balance, reverse: false)
+        let ${prefix}_output <- ${prefix}_swapper.swap(quote: ${prefix}_quoteOut, inVault: <- ${inputVault}) as! @${step.outputToken}.Vault
         `
             default: throw new Error(`Unknown FungibleToken action: ${step.action}`)
         }

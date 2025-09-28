@@ -1,25 +1,61 @@
 import { Handle, Position } from '@xyflow/react';
 import { Clock, RotateCcw } from 'lucide-react';
 
-const CustomNode = ({ children, bgColor, selected }) => (
-    <div className={`px-4 py-3 bg-${bgColor}-100 border-2 rounded-lg shadow-md min-w-[180px] ${selected ? `border-${bgColor}-500` : `border-${bgColor}-300`}`}>
-        {children}
-        <Handle type="target" position={Position.Top} />
-        <Handle type="source" position={Position.Bottom} />
-    </div>
-)
+const CustomNode = ({ children, bgColor, selected }) => {
+    // can't directly create dynamic class using props
+    // https://tailwindcss.com/docs/detecting-classes-in-source-files#dynamic-class-names
+    const colorVariants: { [bg: string]: string } = {
+        blue: `bg-blue-100 ${selected ? 'border-blue-500' : 'border-blue-300'}`,
+        pink: `bg-pink-100 ${selected ? 'border-pink-500' : 'border-pink-300'}`,
+        green: `bg-green-100 ${selected ? 'border-green-500' : 'border-green-300'}`,
+        purple: `bg-purple-100 ${selected ? 'border-purple-500' : 'border-purple-300'}`,
+        yellow: `bg-yellow-100 ${selected ? 'border-yellow-500' : 'border-yellow-300'}`,
+        red: `bg-red-100 ${selected ? 'border-red-500' : 'border-red-300'}`,
+        gray: `bg-gray-100 ${selected ? 'border-gray-500' : 'border-gray-300'}`,
+        indigo: `bg-indigo-100 ${selected ? 'border-indigo-500' : 'border-indigo-300'}`,
+        orange: `bg-orange-100 ${selected ? 'border-orange-500' : 'border-orange-300'}`,
+    }
+    return (
+        <div className={`px-4 py-3 border-2 rounded-lg shadow-md min-w-[180px] ${colorVariants[bgColor]}`}>
+            {children}
+            <Handle type="target" position={Position.Top} />
+            <Handle type="source" position={Position.Bottom} />
+        </div>
+    )
+}
 
-export const WalletNode = ({ data, selected }) => (
+export const WalletSourceNode = ({ data, selected }) => (
     <CustomNode bgColor='blue' selected={selected}>
         <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-            <span className="font-medium text-blue-800">{data.stepNumber}. Wallet</span>
+            <span className="font-medium text-blue-800">{data.stepNumber}. Wallet Source</span>
         </div>
         <div className="mt-2 text-sm text-blue-600">
             <div>Amount: {data.amount || '100'} {data.token || 'FlowToken'}</div>
         </div>
     </CustomNode>
 );
+
+export const WalletSinkNode = ({ data, selected }) => (
+    <CustomNode bgColor='pink' selected={selected}>
+        <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-pink-500 rounded-full"></div>
+            <span className="font-medium text-pink-800">{data.stepNumber}. Wallet Sink</span>
+        </div>
+    </CustomNode>
+);
+
+// export const WalletNode = ({ data, selected }) => (
+//     <CustomNode bgColor='blue' selected={selected}>
+//         <div className="flex items-center gap-2">
+//             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+//             <span className="font-medium text-blue-800">{data.stepNumber}. Wallet</span>
+//         </div>
+//         <div className="mt-2 text-sm text-blue-600">
+//             <div>Amount: {data.amount || '100'} {data.token || 'FlowToken'}</div>
+//         </div>
+//     </CustomNode>
+// );
 
 export const SwapperNode = ({ data, selected }) => (
     <CustomNode bgColor='green' selected={selected}>
