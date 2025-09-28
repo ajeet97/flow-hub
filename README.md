@@ -1,75 +1,92 @@
-# React + TypeScript + Vite
+# FlowHub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Complex DeFi Workflows Made Simple**
 
-Currently, two official plugins are available:
+FlowHub is a visual workflow builder that enables users to create sophisticated DeFi transaction sequences on Flow blockchain without requiring technical knowledge of Cadence. Build, execute, and share complex multi-step DeFi strategies through an intuitive drag-and-drop interface.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## React Compiler
+### **Visual Workflow Builder**
+- Drag-and-drop interface for creating complex DeFi workflows
+- No Cadence programming knowledge required
+- Preview & validate workflow tx before executing
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+### **Atomic Execution**
+- All workflows execute atomically using Cadence transaction scripts
 
-Note: This will impact Vite dev & build performances.
+### **Built-in DeFi Components**
+- **Wallet**: Withdraw/Deposit Funds from wallet
+- **Swap**: Exchange tokens across different DEXs
+- **Liquid Staking**: Stake tokens while maintaining liquidity
 
-## Expanding the ESLint configuration
+## 📋 Example Workflows
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Multi-Step Arbitrage Strategy
+```
+100 FLOW → Swap to USDC → Lend USDC → Borrow stFLOW → Deposit to Yield Protocol
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Simple Liquid Staking
 ```
+100 FLOW → Liquid Stake → Receive stFLOW
+```
+
+### Leveraged Position
+```
+1000 USDC → Deposit as Collateral → Borrow FLOW → Swap to USDC → Repeat
+```
+
+## 🛠 Getting Started
+
+### Prerequisites
+- Flow wallet (Blocto, Lilico, or Flow Wallet)
+- Tokens on Flow mainnet/testnet
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/ajeet97/flowhub.git
+
+# Install dependencies
+cd flowhub
+pnpm install
+
+# Start the development server
+pnpm run dev
+```
+
+### Creating Your First Workflow
+
+1. **Connect Wallet**: Link your Flow wallet to FlowHub
+2. **Select Components**: Click on DeFi components from the sidebar
+3. **Configure Parameters**: Set parameters
+4. **Connect Steps**: Link components to create your workflow sequence
+5. **Validate**: Review the generated Cadence transaction
+6. **Execute**: Sign and execute your atomic workflow
+
+## 🏗 Architecture
+
+### Core Components
+- **Workflow Engine**: Converts visual workflows to Cadence scripts
+- **Component Library**: Modular DeFi building blocks
+
+### Supported Protocols
+Currently IncrementFi's swapper & liquid staking is supported.  
+More protocols can be integrated by building a connector for the protocol.
+
+## 🔮 Future Scope
+- Enhanced Components
+
+  - Flash loans
+  - Amount splitting across multiple steps
+  - Conditional loops and iterations
+  - Multi-wallet capabilities
+
+- Automation & Scheduling
+
+  - Scheduling workflows
+  - Recurring workflows
+
+- Marketplace
+
+  - Workflow Marketplace: Share and monetize custom workflows
