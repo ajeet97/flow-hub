@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Connect, TransactionButton } from "@onflow/react-sdk"
+import { Connect } from "@onflow/react-sdk"
 import {
     ReactFlow,
     Controls,
@@ -27,6 +27,7 @@ import {
 import { ConfigPanel } from './NodeConfigPanel';
 import { convertNodesToSteps } from '../cadence-workflow-tx-generator/convert-nodes-to-steps';
 import { CadenceTxGenerator } from '../cadence-workflow-tx-generator/generate';
+import { PreviewTxModal } from './PreviewTxModal';
 
 const nodeTypes = {
     walletSource: WalletSourceNode,
@@ -64,6 +65,7 @@ const WorkflowBuilder = () => {
         }
     };
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [nodes, setNodes] = useNodesState([
         {
             id: '1',
@@ -156,6 +158,7 @@ const WorkflowBuilder = () => {
         event.stopPropagation();
 
         console.log('txCode:', txCode);
+        setIsModalOpen(true);
 
         // const steps = convertNodesToSteps(nodes);
         // const tx = new CadenceTxGenerator(steps)
@@ -182,24 +185,13 @@ const WorkflowBuilder = () => {
                             Add Component
                         </button> */}
 
-                        <TransactionButton
-                            transaction={{ cadence: txCode }}
-                            label='Execute'
-                            variant='secondary'
-                            className='execute-button'
-                            disabled={!txCode}
-                            mutation={{
-                                onSuccess: (txId) => console.log("Transaction sent:", txId),
-                                onError: (error) => console.error("Transaction failed:", error),
-                            }}
-                        />
-                        {/* <button
+                        <button
                             className="flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
                             onClick={onExecuteClick}
                         >
                             <Play className="w-4 h-4" />
                             Execute
-                        </button> */}
+                        </button>
                         <div className="wallet-connect"><Connect variant='outline' /></div>
                     </div>
                 </div>
@@ -286,6 +278,13 @@ const WorkflowBuilder = () => {
                     showConfig={showConfig}
                     setShowConfig={setShowConfig}
                     updateNodeData={updateNodeData}
+                />
+
+                {/* Preview Tx Modal */}
+                <PreviewTxModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    txCode={txCode}
                 />
             </div>
 
